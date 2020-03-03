@@ -1,0 +1,41 @@
+addEventListener('fetch', event => {
+  event.respondWith(fetchAndApply(event.request))
+})
+
+async function fetchAndApply(request) {
+  const url = new URL(request.url)
+  let suffix = ''
+  let par3 = '';
+  let par4 = '';
+  let par5 = '';
+
+  const sRaiz = 'http://47.241.16.50/';
+  const sPais = request.headers.get('CF-IPCountry');
+
+  const res = url.href.split('?');    	
+  const parametros = res[1];
+
+  try {
+   const par2 = parametros.split('%3F');
+   par3 = par2[0];
+   par4 = par3.replace("%2F", "/");
+  }
+  catch{
+  par3 = '';
+  }
+
+
+  if (request.headers.get('CF-IPCountry') !== 'BR') {
+   
+     return new Response('Sorry, this page is not available.',
+        { status: 403, statusText: 'Forbidden' })     
+  
+  }
+
+  const init = {
+    method: request.method,
+    headers: request.headers
+  }
+  const modifiedRequest = new Request(sRaiz + par4 + '' , init)
+  return fetch(modifiedRequest)
+}
